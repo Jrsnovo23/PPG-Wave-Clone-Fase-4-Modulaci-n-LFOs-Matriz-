@@ -1,0 +1,28 @@
+name: Build VST3 (macOS)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Clonar JUCE
+        run: git clone --depth 1 --branch 7.0.12 https://github.com/juce-framework/JUCE.git
+
+      - name: Configurar proyecto (CMake + Xcode)
+        run: cmake -B build -G Xcode
+
+      - name: Compilar (Release)
+        run: cmake --build build --config Release
+
+      - name: Subir el .vst3 como artefacto descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: PPGWaveClone-VST3-macOS
+          path: build/PPGWaveClone_artefacts/Release/VST3/*.vst3
